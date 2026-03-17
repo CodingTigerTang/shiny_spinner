@@ -1,6 +1,6 @@
 # 🎡 Shiny Spinner (Wheel of Fortune)
 
-[![Shiny App](https://img.shields.io/badge/Render-ShinyApp-blue?style=flat-square&logo=r)](https://tigertang.org/wheel_of_fortune_in_shiny/) 
+[![Shiny App](https://img.shields.io/badge/Render-ShinyApp-blue?style=flat-square&logo=r)](https://tiger-tang.shinyapps.io/shiny_spinner/) 
 [![Blog Post](https://img.shields.io/badge/Read-Blog%20Post-orange?style=flat-square)](https://tigertang.org/wheel_of_fortune_in_shiny/)
 
 A dynamic, interactive "Wheel of Fortune" application built with **R Shiny**. Originally conceived as a team-building ice-breaker, this project demonstrates how to create game-like experiences by bridging R's data visualization with web-native interactivity.
