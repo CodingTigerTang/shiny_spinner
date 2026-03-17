@@ -1,5 +1,5 @@
 
-
+# added questions and deployed it via what_is_this
 library(shiny)
 library(tidyverse)
 library(shinyjs)
@@ -38,7 +38,7 @@ ui <- fluidPage(
             tabPanel("",     
                      sidebarLayout(
                        sidebarPanel(textAreaInput("names","Entries",height = "250px",value = c("Tiger\nClaire\nDiego\nBanita\nEagle\nCoffee\n")),
-                                    #  actionButton("history",label = "",icon = icon("book")), commen this out for reproducibility on git
+                                      actionButton("history",label = "",icon = icon("book")), #comment this out for reproducibility on git
                                     width = 3),
                        mainPanel = mainPanel(width = 6,plotOutput("spin",width = "550px",height = "550px",click = "spin_start"),align="center"),
                       
@@ -46,7 +46,7 @@ ui <- fluidPage(
             )
           ))
 )
-
+questions <- read_csv("data/question_list.csv") 
 server <- function(input,output,session) {
   
   names <- reactive({strsplit(input$names,split = "\n") %>% pluck(1)})  
@@ -81,15 +81,17 @@ server <- function(input,output,session) {
               
               modalDialog(
                 title = sprintf("Congrats %s",names()[number()]),
-                renderUI({
+                div(renderUI({
                   gif <- giphyr::gif_search("congrats",img_format = c("downsized_medium"))[,-24] %>% sample_n(1)
                   actionLink(gif$id, title = gif$slug,
                              label = NULL, class = "gifpreview", icon = NULL,
                              tags$img(src = gif$downsized_medium))
                 }),
+                uiOutput(outputId = "question_ui")),
                 
                 easyClose = F,size = "m",
                 footer = tagList(
+                  actionButton("question", "Random question"),
                   actionButton("reset", "Spinner again"),
                   actionButton("remove", "Remove"),
                 )
@@ -101,6 +103,21 @@ server <- function(input,output,session) {
     })
     
   })
+  
+  observeEvent(input$question,{
+  
+    js$stopConfettiInner()
+    question_ui <- renderUI({
+      
+      text <- questions %>% sample_n(1) %>% pull(Questions)
+      
+      shinydashboard::box(title = text,width=12,solidHeader = T,background = "light-blue",
+                          status = 'primary'
+      )
+      
+    })
+  })
+  
   observeEvent(input$reset,{
     
     chosen <- chosen(c(chosen(),names()[number()]))
@@ -131,14 +148,14 @@ server <- function(input,output,session) {
   observeEvent(input$spin_start,{
     active(T)
     
-    data.frame(
-      session = session$token,
-      date = Sys.Date(),
-      times = 1,
-      stringsAsFactors = F
-    ) %>% 
-      bind_rows(data_on_gs()) %>% 
-      save_record_gs()
+    # data.frame(
+    #   session = session$token,
+    #   date = Sys.Date(),
+    #   times = 1,
+    #   stringsAsFactors = F
+    # ) %>% 
+    #   bind_rows(data_on_gs()) %>% 
+    #   save_record_gs()
     
   })
   
@@ -230,17 +247,17 @@ server <- function(input,output,session) {
     }
     
     plot_function(number())
-  }) #%>% 
-    #bindCache(number(),input$names)
+  }) %>% 
+    bindCache(number(),input$names)
   
-  output$questions <- renderUI({
+output$question_ui <- renderUI({
     req(input$question)
     text <- questions %>% sample_n(1) %>% pull(Questions)
     
     shinydashboard::box(title = text,width=12,solidHeader = T,background = "light-blue",
                         status = 'primary'
     )
-  })  
+})  
   
   
 }
